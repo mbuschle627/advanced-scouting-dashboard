@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MLB Advance Scouting Engine · 30-Team Auto Update | Max Buschle</title>
+  <style>
+:root{
+  --bg:#0b1018;
+  --panel:#121a25;
+  --panel2:#182230;
+  --ink:#eef4ff;
+  --muted:#9fb0c5;
+  --line:#263246;
+  --accent:#e63946;
+  --accent2:#4cc9f0;
+  --good:#3ad29f;
+  --warn:#ffcf5c;
+  --bad:#ff6b6b;
+  --card-shadow:0 24px 80px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0%,#172338 0%,var(--bg) 45%,#070b11 100%);color:var(--ink);line-height:1.5}
+a{color:var(--accent2)}
+.hero{padding:28px 36px 18px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,rgba(230,57,70,.14),rgba(76,201,240,.08) 52%,rgba(255,255,255,.02));position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}
+.hero-top{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}
+h1{font-size:clamp(30px,4vw,58px);line-height:.95;margin:8px 0 10px;letter-spacing:-1.6px}
+h2{margin:0 0 14px;font-size:24px;letter-spacing:-.3px} h3{margin:0 0 9px;font-size:17px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--accent2);margin:0 0 4px;font-weight:800}.subtitle{margin:0;color:var(--muted);font-size:17px}.muted{color:var(--muted);margin:0}.contact-card{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:18px;padding:16px 18px;display:grid;gap:2px;min-width:260px;box-shadow:var(--card-shadow)}.contact-card strong{font-size:18px}.contact-card span{color:var(--muted);font-size:13px}.selector-banner{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}.selector-card{background:rgba(7,11,17,.5);border:1px solid var(--line);border-radius:16px;padding:14px}.selector-card label,.label{display:block;text-transform:uppercase;letter-spacing:.13em;font-size:10px;color:var(--muted);font-weight:800;margin-bottom:5px}.selector-card strong{font-size:18px}.select-wrap{display:flex;gap:8px;align-items:center}.select-wrap select{width:100%;background:#0d1420;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}.btn,.print-btn{background:var(--accent);color:white;border:0;border-radius:999px;padding:10px 15px;font-weight:800;cursor:pointer}.btn.secondary{background:#243246;color:var(--ink);border:1px solid var(--line)}.status-chip{border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;border:1px solid var(--line)}.status-chip.good{background:rgba(58,210,159,.12);color:var(--good)}.status-chip.warn{background:rgba(255,207,92,.12);color:var(--warn)}.status-chip.bad{background:rgba(255,107,107,.12);color:var(--bad)}.status-chip.info{background:rgba(76,201,240,.12);color:var(--accent2)}
+main{max-width:1480px;margin:0 auto;padding:22px 30px 60px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px}.tab{border:1px solid var(--line);background:rgba(18,26,37,.75);color:var(--muted);border-radius:999px;padding:10px 14px;font-weight:800;cursor:pointer}.tab.active{background:var(--ink);color:#0b1018}.panel{display:none}.panel.active{display:block}.grid{display:grid;gap:18px}.grid.two{grid-template-columns:minmax(0,1.25fr) minmax(310px,.75fr)}.grid.three{grid-template-columns:repeat(3,1fr)}.card,.mini-card{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--card-shadow);overflow:hidden}.big-note p{font-size:16px;color:#cbd7e8}.mini-card{position:relative;min-height:210px}.mini-card .num{font-size:36px;color:rgba(255,255,255,.12);font-weight:900}.mini-card strong{display:block;color:#e8efff;margin:12px 0}.card-title-row{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.section-head{display:flex;justify-content:space-between;gap:28px;align-items:flex-end;margin:6px 0 18px}.section-head p{max-width:760px;color:var(--muted)}.stat-stack{display:grid;gap:10px}.stat-row{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:9px 0}.stat-row span{color:var(--muted)}.stat-row strong{text-align:right}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px}table{border-collapse:collapse;width:100%;min-width:760px}th,td{padding:12px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{color:#b8c8dd;background:rgba(255,255,255,.04);font-size:12px;text-transform:uppercase;letter-spacing:.08em}td{font-size:14px;color:#d7e2f1}.pill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--line)}.pill.high{background:rgba(230,57,70,.16);color:#ff8d96}.pill.medium{background:rgba(255,207,92,.14);color:var(--warn)}.pill.lower{background:rgba(76,201,240,.12);color:var(--accent2)}.pill.good{background:rgba(58,210,159,.14);color:var(--good)}.choice{background:#111a27;border:1px solid var(--line);color:var(--ink);border-radius:16px;padding:12px 14px;cursor:pointer;text-align:left;font-weight:900;min-width:180px}.choice span{display:block;color:var(--muted);font-weight:600;font-size:12px;margin-top:4px}.choice.active{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(76,201,240,.14)}.selector-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.score-box{border:1px solid var(--line);border-radius:16px;padding:12px 16px;min-width:110px;text-align:center;background:rgba(0,0,0,.16)}.score-box span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:900}.score-box strong{font-size:27px}.line-box{border-left:4px solid var(--accent2);background:rgba(76,201,240,.08);padding:12px 14px;border-radius:12px;margin:0 0 18px;color:#eaf7ff;font-weight:800}.data-gap{border:1px dashed rgba(255,207,92,.6);background:rgba(255,207,92,.08);color:#ffe39b;border-radius:14px;padding:12px 14px}.callout{background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:18px;padding:16px}.callout ul{margin:0;padding-left:20px}.toolbar{display:flex;gap:10px;margin-bottom:16px}.toolbar input,.toolbar select{background:#0d1420;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 14px}.toolbar input{min-width:320px}.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.hitter-card p{color:#cbd7e8}.meter{height:9px;background:#0c121d;border-radius:999px;overflow:hidden;border:1px solid var(--line)}.meter span{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:999px}.meter-label{font-size:12px;color:var(--muted);margin:6px 0 14px}.bar-row{display:grid;grid-template-columns:180px 1fr 42px;gap:12px;align-items:center;margin:11px 0}.source-list li{margin-bottom:10px;color:#d2ddec}.empty{border:1px dashed var(--line);border-radius:18px;padding:22px;color:var(--muted);background:rgba(255,255,255,.03)}code{background:#07101b;border:1px solid var(--line);border-radius:6px;padding:2px 5px;color:#c7f4ff}.pipeline-code{background:#07101b;border:1px solid var(--line);border-radius:16px;padding:15px;overflow:auto;color:#e5f8ff}.progress{color:var(--muted);font-size:13px;margin-left:6px}
+footer{border-top:1px solid var(--line);padding:24px 36px;color:var(--muted);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#080c12}
+@media(max-width:1050px){.hero-top,.section-head{display:block}.contact-card{margin-top:16px}.selector-banner,.grid.two,.grid.three,.card-grid{grid-template-columns:1fr}.hero{position:static}.toolbar{display:block}.toolbar input,.toolbar select{width:100%;margin-bottom:10px}.bar-row{grid-template-columns:1fr}.selector-banner{gap:10px}}
+@media print{body{background:white;color:#111}.hero,footer,.tabs,.hero-actions,.toolbar,.print-btn{display:none!important}main{padding:0;max-width:none}.panel{display:block!important;break-after:page}.card,.mini-card{box-shadow:none;border-color:#ccc;background:white;color:#111;break-inside:avoid}.muted,.section-head p,.big-note p,.hitter-card p,td{color:#222}th{color:#111;background:#eee}.pill{color:#111}.table-wrap{border-color:#ccc}.meter span{background:#555}}
+.compact-table table{min-width:620px}.large-value{font-size:30px;display:block;margin:8px 0;color:#fff}.muted-small{color:var(--muted);font-size:12px;display:block;margin-top:6px}.hitter-card p{margin:8px 0}.starter-card .grid.two{margin:18px 0}.mini-card h3{margin-bottom:6px}.bar-row small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.pill.loading{background:rgba(76,201,240,.12);color:var(--accent2)}
+.explain-card{background:linear-gradient(180deg,rgba(76,201,240,.075),rgba(255,255,255,.02));}
+.explain-card p{color:#cbd7e8;margin:0 0 10px}.legend-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.legend-row span{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(0,0,0,.18);font-size:12px;color:#dce8f7}.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.metric-chip{border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.16);padding:8px}.metric-chip span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.metric-chip strong{font-size:16px}.tag-list{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.tag{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.045);padding:4px 8px;font-size:11px;color:#d7e2f1}.scouting-note{border-left:3px solid var(--accent2);padding-left:10px;color:#d9e6f7}.subtle{color:var(--muted);font-size:12px}
+@media(max-width:1050px){.metric-grid{grid-template-columns:1fr}.legend-row{display:grid}}
+
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <p class="eyebrow">Portfolio Project · Baseball Operations / Advance Scouting</p>
+        <h1>MLB Advance Scouting Engine</h1>
+        <p class="subtitle">30-team opponent game-plan generator with our-club matchup context, live MLB data mode, and Statcast/FanGraphs update pipeline</p>
+      </div>
+      <div class="contact-card">
+        <strong>Max Buschle</strong>
+        <span>Baseball Operations / Player Evaluation</span>
+        <a href="mailto:mbuschle627@gmail.com">mbuschle627@gmail.com</a>
+        <span>@mbuschle627</span>
+      </div>
+    </div>
+
+    <div class="selector-banner">
+      <div class="selector-card">
+        <label for="ourTeamSelect">Our Club</label>
+        <div class="select-wrap"><select id="ourTeamSelect"></select></div>
+        <strong id="ourClubLabel">Cincinnati Reds</strong>
+      </div>
+      <div class="selector-card">
+        <label for="opponentSelect">Opponent Packet</label>
+        <div class="select-wrap"><select id="opponentSelect"></select></div>
+        <strong id="opponentLabel">Milwaukee Brewers</strong>
+      </div>
+      <div class="selector-card">
+        <span class="label">Snapshot / Refresh</span>
+        <strong id="snapshotLabel">Not refreshed</strong>
+      </div>
+      <div class="selector-card">
+        <span class="label">Use Case</span>
+        <strong id="useCaseLabel">30-Team Advance Packet</strong>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button class="btn" id="refreshLiveBtn">Refresh Live MLB Data</button>
+      <button class="btn secondary" id="printBtn">Print Packet</button>
+      <span id="dataStatus" class="status-chip warn">No local cache yet</span>
+      <span id="liveProgress" class="progress"></span>
+    </div>
+  </header>
+
+  <main>
+    <nav class="tabs" aria-label="Scouting report sections">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="matchup">Our Club Matchup</button>
+      <button class="tab" data-tab="starters">Starting Pitchers</button>
+      <button class="tab" data-tab="hitters">Hitter Attack Cards</button>
+      <button class="tab" data-tab="bullpen">Bullpen / Availability</button>
+      <button class="tab" data-tab="tendencies">Tendency Model</button>
+      <button class="tab" data-tab="pipeline">Auto-Update Pipeline</button>
+    </nav>
+
+    <section id="overview" class="panel active">
+      <div class="grid two">
+        <article class="card big-note">
+          <div class="card-title-row">
+            <h2>Series Game Plan</h2>
+            <span class="pill high">Advance Priority</span>
+          </div>
+          <div id="seriesText"></div>
+        </article>
+        <article class="card">
+          <h2>Opponent Snapshot</h2>
+          <div class="stat-stack" id="teamSnapshot"></div>
+        </article>
+      </div>
+
+      <div class="grid two" style="margin-top:18px">
+        <article class="card big-note">
+          <div class="card-title-row">
+            <h2>Our Club Matchup Layer</h2>
+            <span class="pill good" id="matchupMode">Live H2H</span>
+          </div>
+          <div id="ourClubMini"></div>
+        </article>
+        <article class="card">
+          <h2>Recent Results vs Selected Club</h2>
+          <div class="table-wrap compact-table">
+            <table>
+              <thead><tr><th>Date</th><th>Matchup</th><th>Score</th><th>Result</th><th>Venue</th></tr></thead>
+              <tbody id="miniH2HTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+
+      <div class="grid three" id="priorityCards" style="margin-top:18px"></div>
+
+      <div class="grid two" style="margin-top:18px">
+        <article class="card">
+          <div class="card-title-row">
+            <h2>Advance Scouting Priorities</h2>
+            <button class="print-btn" onclick="window.print()">Print</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Area</th><th>Why It Matters</th><th>Game Action</th><th>Impact</th></tr></thead>
+              <tbody id="priorityTable"></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="card">
+          <h2>Upcoming Schedule / Probables</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Opponent</th><th>Venue</th><th>Probables</th><th>Status</th></tr></thead>
+              <tbody id="upcomingGames"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="matchup" class="panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Our-club integration</p>
+          <h2>Our Club vs Selected Opponent</h2>
+        </div>
+        <p>This layer makes the packet matchup-specific: recent head-to-head results, upcoming games, run differential, venue context, probable starter lanes, and tactical adjustments for how our selected club should attack the opponent.</p>
+      </div>
+      <div class="grid three" id="matchupCards"></div>
+      <div class="grid two" style="margin-top:18px">
+        <article class="card">
+          <h2>Head-to-Head Results</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Game</th><th>Venue</th><th>Score</th><th>Decision</th><th>Status</th></tr></thead>
+              <tbody id="h2hTable"></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="card big-note">
+          <h2>Our Club Tactical Adjustment</h2>
+          <div id="clubGamePlan"></div>
+        </article>
+      </div>
+      <article class="card" style="margin-top:18px">
+        <h2>Matchup Priority Board</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Priority</th><th>Report Use</th><th>What It Means For Our Club</th><th>Action</th></tr></thead>
+            <tbody id="matchupPriorityTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="starters" class="panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Pitcher reports</p>
+          <h2>Opposing Starting Pitcher Attack Plans</h2>
+        </div>
+        <p>Live mode uses MLB season lines and bats/throws fields. The auto-update pipeline adds Statcast arsenal usage, velocity, movement, whiff, CSW, chase, FanGraphs context, and unique player-specific notes.</p>
+      </div>
+      <article class="card explain-card" style="margin-bottom:18px">
+        <h2>How to Read the Starter Attack Plan</h2>
+        <p><strong>Threat</strong> estimates run-prevention quality from public season line, K rate, WHIP, and run prevention. <strong>Predictability</strong> estimates how pattern-based the pitcher is, using starts/workload in live mode and pitch-concentration/count tendencies after the updater runs. The final attack plan separates what our hitters should do early, when ahead, and with two strikes.</p>
+      </article>
+      <div id="starterSelector" class="selector-row"></div>
+      <div id="starterDetail"></div>
+    </section>
+
+    <section id="hitters" class="panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Lineup plan</p>
+          <h2>Hitter Attack Cards</h2>
+        </div>
+        <p>Cards translate public batting lines, B/T, swing profile, run value indicators, and contact-quality notes into pitcher-facing attack plans. Each player receives a unique note instead of copied template language.</p>
+      </div>
+      <div class="toolbar">
+        <input id="hitterSearch" type="search" placeholder="Search hitter, handedness, weakness..." />
+        <select id="riskFilter">
+          <option value="all">All threat levels</option>
+          <option value="High">High threat</option>
+          <option value="Medium">Medium threat</option>
+          <option value="Lower">Lower threat</option>
+        </select>
+      </div>
+      <article class="card explain-card" style="margin-bottom:18px">
+        <h2>Attackability Explained</h2>
+        <p><strong>Attackability is not the same as threat.</strong> A dangerous hitter can still be attackable if there is a clear path to get him out. Higher scores mean the report found a more obvious plan, usually from strikeout rate, lower walk pressure, chase/contact indicators, or a narrower damage profile. Lower scores mean the hitter is harder to game-plan because he controls the zone, makes contact, or damages multiple lanes.</p>
+        <div class="legend-row">
+          <span><strong>75+</strong> clear exploit lane</span>
+          <span><strong>55–74</strong> manageable with execution</span>
+          <span><strong>&lt;55</strong> careful plan, fewer free outs</span>
+        </div>
+      </article>
+      <div id="hitterCards" class="card-grid"></div>
+    </section>
+
+    <section id="bullpen" class="panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Late-game plan</p>
+          <h2>Bullpen Matchup & Availability Board</h2>
+        </div>
+        <p>Live mode builds the bullpen board from active roster pitcher season lines and handedness. The updater can add recent usage, pitch-level reliever traits, and individualized late-game attack notes.</p>
+      </div>
+      <div class="grid two">
+        <article class="card">
+          <h2>Bullpen Stress Summary</h2>
+          <div id="bullpenStress" class="meter-list"></div>
+        </article>
+        <article class="card big-note">
+          <h2>Late-Inning Offensive Plan</h2>
+          <p>Force the opponent to use middle relief before clean leverage matchups appear. Live data identifies the likely reliever group. The scheduled Statcast/FanGraphs cache should be used for the final game-day version because it can account for pitch traits and recent usage.</p>
+        </article>
+      </div>
+      <article class="card" style="margin-top:18px">
+        <h2>Reliever Board</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Pitcher</th><th>Throws</th><th>Role</th><th>Public Stat / Arsenal Note</th><th>Availability</th><th>Attack Plan</th></tr></thead>
+            <tbody id="relieverTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="tendencies" class="panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Model layer</p>
+          <h2>Pitch Tendency Model</h2>
+        </div>
+        <p>Probabilities are derived portfolio metrics. With the updater, pitch concentration and count-specific Statcast tendencies replace the simpler live-mode estimates.</p>
+      </div>
+      <div class="grid two">
+        <article class="card">
+          <h2>Situation-Based Tendency Board</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Pitcher</th><th>Situation</th><th>Likely Pitch</th><th>Probability</th><th>Hitter Note</th></tr></thead>
+              <tbody id="tendencyTable"></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="card">
+          <h2>Predictability Scores</h2>
+          <div id="predictabilityBars"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="pipeline" class="panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Data transparency</p>
+          <h2>Auto-Update Pipeline</h2>
+        </div>
+        <p>This is what makes the project season-proof. The browser can refresh MLB data and head-to-head matchup context; the Python pipeline generates advanced Statcast/FanGraphs packets for all 30 teams.</p>
+      </div>
+      <div class="grid two">
+        <article class="card">
+          <h2>Public Data Used</h2>
+          <ul class="source-list" id="sourceList"></ul>
+        </article>
+        <article class="card big-note">
+          <h2>How to Auto-Update</h2>
+          <p>Run the updater locally or host the folder on GitHub Pages with the included scheduled workflow. The updater writes <code>data/teamPackets.json</code>, which the dashboard automatically loads on refresh.</p>
+          <pre class="pipeline-code">python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python tools/update_data.py --season 2026 --lookback-days 35</pre>
+          <p><strong>GitHub Pages workflow:</strong> the included <code>.github/workflows/update-data.yml</code> runs daily, rebuilds the packets, and commits the updated JSON.</p>
+          <p><strong>Professional caveat:</strong> this does not use proprietary Hawk-Eye, ABS, or club data. Statcast/FanGraphs outputs are public-data approximations for portfolio use.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>MLB Advance Scouting Engine · Max Buschle · <a href="mailto:mbuschle627@gmail.com">mbuschle627@gmail.com</a></span>
+    <span>Built for Baseball Operations / Advance Scouting portfolio use</span>
+  </footer>
+
+  <script>
+const TEAM_CONFIG = [
+  {id:108, abbr:'LAA', name:'Los Angeles Angels', league:'AL', division:'AL West', park:'Angel Stadium'},
+  {id:109, abbr:'AZ', name:'Arizona Diamondbacks', league:'NL', division:'NL West', park:'Chase Field'},
+  {id:110, abbr:'BAL', name:'Baltimore Orioles', league:'AL', division:'AL East', park:'Oriole Park at Camden Yards'},
+  {id:111, abbr:'BOS', name:'Boston Red Sox', league:'AL', division:'AL East', park:'Fenway Park'},
+  {id:112, abbr:'CHC', name:'Chicago Cubs', league:'NL', division:'NL Central', park:'Wrigley Field'},
+  {id:113, abbr:'CIN', name:'Cincinnati Reds', league:'NL', division:'NL Central', park:'Great American Ball Park'},
+  {id:114, abbr:'CLE', name:'Cleveland Guardians', league:'AL', division:'AL Central', park:'Progressive Field'},
+  {id:115, abbr:'COL', name:'Colorado Rockies', league:'NL', division:'NL West', park:'Coors Field'},
+  {id:116, abbr:'DET', name:'Detroit Tigers', league:'AL', division:'AL Central', park:'Comerica Park'},
+  {id:117, abbr:'HOU', name:'Houston Astros', league:'AL', division:'AL West', park:'Daikin Park'},
+  {id:118, abbr:'KC', name:'Kansas City Royals', league:'AL', division:'AL Central', park:'Kauffman Stadium'},
+  {id:119, abbr:'LAD', name:'Los Angeles Dodgers', league:'NL', division:'NL West', park:'Dodger Stadium'},
+  {id:120, abbr:'WSH', name:'Washington Nationals', league:'NL', division:'NL East', park:'Nationals Park'},
+  {id:121, abbr:'NYM', name:'New York Mets', league:'NL', division:'NL East', park:'Citi Field'},
+  {id:133, abbr:'OAK', name:'Athletics', league:'AL', division:'AL West', park:'Sutter Health Park'},
+  {id:134, abbr:'PIT', name:'Pittsburgh Pirates', league:'NL', division:'NL Central', park:'PNC Park'},
+  {id:135, abbr:'SD', name:'San Diego Padres', league:'NL', division:'NL West', park:'Petco Park'},
+  {id:136, abbr:'SEA', name:'Seattle Mariners', league:'AL', division:'AL West', park:'T-Mobile Park'},
+  {id:137, abbr:'SF', name:'San Francisco Giants', league:'NL', division:'NL West', park:'Oracle Park'},
+  {id:138, abbr:'STL', name:'St. Louis Cardinals', league:'NL', division:'NL Central', park:'Busch Stadium'},
+  {id:139, abbr:'TB', name:'Tampa Bay Rays', league:'AL', division:'AL East', park:'Steinbrenner Field'},
+  {id:140, abbr:'TEX', name:'Texas Rangers', league:'AL', division:'AL West', park:'Globe Life Field'},
+  {id:141, abbr:'TOR', name:'Toronto Blue Jays', league:'AL', division:'AL East', park:'Rogers Centre'},
+  {id:142, abbr:'MIN', name:'Minnesota Twins', league:'AL', division:'AL Central', park:'Target Field'},
+  {id:143, abbr:'PHI', name:'Philadelphia Phillies', league:'NL', division:'NL East', park:'Citizens Bank Park'},
+  {id:144, abbr:'ATL', name:'Atlanta Braves', league:'NL', division:'NL East', park:'Truist Park'},
+  {id:145, abbr:'CWS', name:'Chicago White Sox', league:'AL', division:'AL Central', park:'Guaranteed Rate Field'},
+  {id:146, abbr:'MIA', name:'Miami Marlins', league:'NL', division:'NL East', park:'loanDepot park'},
+  {id:147, abbr:'NYY', name:'New York Yankees', league:'AL', division:'AL East', park:'Yankee Stadium'},
+  {id:158, abbr:'MIL', name:'Milwaukee Brewers', league:'NL', division:'NL Central', park:'American Family Field'}
+];
+
+</script>
+  <script>
+const TEAM_PACKET_CACHE = {
+  "158": {
+    meta: {
+      source: "Seed packet from public FanGraphs/Baseball Savant snapshot; replaceable by updater output.",
+      updatedAt: "2026-06-15",
+      teamId: 158,
+      opponent: "Milwaukee Brewers",
+      abbr: "MIL"
+    },
+    overview: {
+      theme: "Control Milwaukee's speed/contact pressure, avoid middle-third damage to the highest-impact bats, and use the Our Club Matchup tab to fold in recent Cincinnati vs. Milwaukee results.",
+      notes: [
+        "Use this public-data packet as a template for how the auto-updated version will read after the pipeline runs.",
+        "Advance plan is split between opponent starter attack plans, hitter weakness cards, bullpen exposure, pitch tendencies, and our-club matchup context.",
+        "Derived scores are portfolio metrics, not proprietary club, Hawk-Eye, or ABS outputs."
+      ],
+      priorities: [
+        {area:"Jackson Chourio", why:"Impact contact-quality bat in the seed snapshot with right-handed damage risk.", action:"Avoid middle-in/middle-up misses; expand late with spin below or soft away only after strike one.", impact:"High"},
+        {area:"Brice Turang / table setters", why:"OBP and speed can create run-pressure innings before the middle of the order.", action:"Attack early strikes, vary hold times, and avoid free passes ahead of damage bats.", impact:"High"},
+        {area:"Power starters", why:"Velocity-heavy starters can shorten at-bats when hitters chase above the zone.", action:"Shrink the top rail and force secondaries into the zone before offering.", impact:"High"},
+        {area:"Our club matchup", why:"The report now updates recent results and run differential for the selected Our Club/Opponent pairing.", action:"Use the H2H tab to adjust the final series plan after selecting our club.", impact:"High"}
+      ]
+    },
+    starters: [
+      {
+        id:"misiorowski", name:"Jacob Misiorowski", bats:"R", throws:"R", role:"Power starter", bio:"RHP · MIL · B/T R/R · public Statcast seed snapshot", line:"100.1 mph average four-seamer in seed packet; elite velocity foundation", predictability:72, threat:92,
+        arsenal:[
+          {pitch:"Four-Seamer", usage:63.4, velo:100.1, ivb:19.0, hb:null, whiff:null, csw:null, note:"Primary weapon; top-end velocity changes the zone."},
+          {pitch:"Slider", usage:13.5, velo:93.1, ivb:null, hb:6.3, whiff:null, csw:null, note:"Hard bullet shape used as chase/finish lane."},
+          {pitch:"Curveball", usage:10.6, velo:87.4, ivb:null, hb:null, whiff:null, csw:null, note:"Power breaking ball for eye-level change."},
+          {pitch:"Cutter", usage:10.3, velo:96.4, ivb:null, hb:null, whiff:null, csw:null, note:"Hard glove-side speed band."}
+        ],
+        advanceNote:"Misiorowski is the seed packet's pure velocity checkpoint. The report should separate hittable strikes from chase velocity because his fastball can beat hitters above the zone even when it looks tempting.",
+        sequenceNote:"Sequence note: do not let the four-seamer set up an automatic two-strike chase. Hitters need to identify whether the fastball is entering the zone or climbing above the rail.",
+        countPlan:"Advantage counts: hunt one fastball lane only. Two strikes: protect velocity but refuse chase above the zone.",
+        vsR:"Expect power fastballs early and hard slider/cutter shapes when ahead. Right-handed hitters cannot let the fastball beat them above the zone.",
+        vsL:"Left-handed hitters will see the fastball as the foundation with curve/cutter/change variants to change shape.",
+        plan:["Start fast. Do damage before two-strike leverage.","Shrink the zone up and avoid chase above the rail.","Make secondaries enter the zone before offering below.","Treat 0-2 and 1-2 as chase counts."],
+        damageZone:"Middle-third fastballs only. Do not expand above the zone just because it is hittable velocity."
+      },
+      {
+        id:"harrison", name:"Kyle Harrison", bats:"R", throws:"L", role:"Left-handed starter", bio:"LHP · MIL · B/T R/L · fastball/slurve profile", line:"Seed packet uses public Statcast/FanGraphs-style snapshot", predictability:66, threat:78,
+        arsenal:[
+          {pitch:"Four-Seamer", usage:59.1, velo:96.0, ivb:null, hb:null, whiff:null, csw:null, note:"Primary lane; elevated fastball look."},
+          {pitch:"Slurve", usage:30.0, velo:null, ivb:null, hb:null, whiff:null, csw:null, note:"Main secondary shape below/away."},
+          {pitch:"Changeup", usage:9.5, velo:null, ivb:null, hb:null, whiff:null, csw:null, note:"Third lane to right-handed hitters."}
+        ],
+        advanceNote:"Harrison gives the packet a left-handed fastball/slurve look. The offensive plan should ask right-handed hitters to force the slurve into the zone and not donate chase below the plate.",
+        sequenceNote:"Sequence note: his fastball volume means the report should emphasize when to hunt elevated velocity and when to wait out the breaking ball below the zone.",
+        countPlan:"Advantage counts: force fastball quality in the zone. Two strikes: protect down/away spin without chasing noncompetitive shape.",
+        vsR:"Righties should expect elevated fastballs and breaking balls below/away. Force the changeup into the zone.",
+        vsL:"Left-on-left matchups can become fastball/slurve dominant. Make him prove the breaking ball early.",
+        plan:["Righties hunt fastball before two strikes.","Avoid expanding on slurve below the zone.","Force changeup quality in the zone.","Look for middle/up fastball mistakes."],
+        damageZone:"Middle-up fastballs to right-handed hitters."
+      }
+    ],
+    hitters: [
+      {name:"Jackson Chourio", bats:"R", throws:"R", pos:"OF", line:"Impact contact-quality bat", threat:"High", attackability:42, strength:"Chourio can damage middle-third mistakes and turn a small location error into a crooked inning.", weakness:"Chourio is more manageable if he is forced to cover soft away before seeing anything middle-in.", plan:"Stay out of middle-in lanes. Expand with spin below after strike one, not before.", advanceNote:"Jackson Chourio (B/T R/R, OF) is the damage checkpoint in this seed packet. Treat him as the hitter who changes the run-prevention plan.", countPlan:"Neutral counts: do not show an obvious heater lane. Two strikes: expand below only after establishing strike quality.", avoidZone:"Middle-in and middle-up fastballs."},
+      {name:"Brice Turang", bats:"L", throws:"R", pos:"2B", line:"OBP/speed pressure profile", threat:"High", attackability:58, strength:"Turang's value is inning creation through contact, speed, and baserunning pressure.", weakness:"Turang's damage risk drops if he is kept off base and forced to hit from behind in the count.", plan:"Attack early strikes. Do not give free bases ahead of the middle order.", advanceNote:"Brice Turang (B/T L/R, 2B) should be treated as a table-setter, not a pure damage bat. The first priority is preventing free traffic.", countPlan:"Neutral counts: strike one matters. With men on: vary looks and keep the running game under control.", avoidZone:"Walks, slow tempo, and free steals."},
+      {name:"William Contreras", bats:"R", throws:"R", pos:"C", line:"Contact/OBP catcher profile", threat:"High", attackability:48, strength:"Contreras controls the zone well enough to extend innings and punish predictable execution.", weakness:"His weakness is less about one hole and more about making him cover multiple lanes without center-cut mistakes.", plan:"Avoid predictable fastballs in advantage counts. Finish just off the edge after showing a strike.", advanceNote:"William Contreras (B/T R/R, C) is the plate-discipline checkpoint. Do not let him turn nibbling into walks before the Brewers' damage bats.", countPlan:"Neutral counts: land a competitive strike. Hitter counts: pick an edge and avoid the heart.", avoidZone:"Repeated fastball lane in advantage counts."},
+      {name:"Jake Bauers", bats:"L", throws:"L", pos:"1B/OF", line:"Power-side matchup threat", threat:"Medium", attackability:62, strength:"Bauers can punish fastballs in pull-side damage lanes against the wrong matchup.", weakness:"Spin/change shape can create chase when the pitcher gets ahead.", plan:"Use velocity above as the setup, then finish below or soft away.", advanceNote:"Jake Bauers (B/T L/L, 1B/OF) is the left-handed power matchup in the seed packet. The plan is about avoiding the one swing, not pitching around him completely.", countPlan:"Get ahead, then expand. Do not let him sit one speed middle-in.", avoidZone:"Pull-side fastball leakage."}
+    ],
+    bullpen: [
+      {name:"Trevor Megill", bats:"R", throws:"R", role:"Leverage", stat:"Power late-inning arm", availability:"Refresh needed", stress:64, plan:"Make Megill land secondary pitches before expanding.", advanceNote:"Trevor Megill (B/T R/R) is the late-inning power look. The offensive goal is to avoid expanding before he proves strike quality."},
+      {name:"Abner Uribe", bats:"R", throws:"R", role:"Power relief", stat:"Velocity-first profile", availability:"Refresh needed", stress:58, plan:"Sit velocity, force slider into the zone.", advanceNote:"Abner Uribe (B/T R/R) gives Milwaukee a velocity-first relief look. Our hitters should simplify to one speed and one lane early."},
+      {name:"Aaron Ashby", bats:"R", throws:"L", role:"Left-handed bridge", stat:"Multi-inning matchup look", availability:"Refresh needed", stress:47, plan:"Right-handed hitters should avoid early soft-contact rollovers.", advanceNote:"Aaron Ashby (B/T R/L) is the left-handed bridge/multi-inning look. Right-handed bats should force him up before chasing soft down."}
+    ]
+  }
+};
+
+</script>
+  <script>
+/* MLB Advance Scouting Engine - 30 Team / Auto Update Version
+   Max Buschle portfolio project
+*/
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+const SEASON = new Date().getFullYear();
+const MLB_API = 'https://statsapi.mlb.com/api/v1';
+
+let state = {
+  ourTeamId: 113,
+  opponentId: 158,
+  packet: null,
+  matchup: null,
+  liveStatus: 'seed',
+  matchupStatus: 'idle',
+  loading: false,
+  lastUpdated: null,
+  selectedStarterIndex: 0,
+};
+
+const safeNum = (value, fallback = null) => {
+  if (value === undefined || value === null || value === '' || value === '-' || value === '—') return fallback;
+  const n = Number(String(value).replace('%',''));
+  return Number.isFinite(n) ? n : fallback;
+};
+const fmt = (value, digits=0, fallback='—') => {
+  const n = safeNum(value);
+  if (n === null) return fallback;
+  return n.toFixed(digits);
+};
+const pct = (value, digits=1) => {
+  const n = safeNum(value);
+  if (n === null) return '—';
+  return `${n.toFixed(digits)}%`;
+};
+const todayISO = () => new Date().toISOString().slice(0,10);
+const seasonStartISO = () => `${SEASON}-03-01`;
+const addDaysISO = (days) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0,10);
+};
+const teamById = (id) => TEAM_CONFIG.find(t => Number(t.id) === Number(id));
+const teamLabel = (id) => {
+  const t = teamById(id);
+  return t ? `${t.name} (${t.abbr})` : `Team ${id}`;
+};
+const hashText = (text='') => Array.from(String(text)).reduce((a,c)=>((a<<5)-a)+c.charCodeAt(0),0);
+const pick = (arr, key) => arr[Math.abs(hashText(key)) % arr.length];
+const handed = (bats, throws) => `B/T ${bats || '—'}/${throws || '—'}`;
+const html = (v) => String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function initSelectors(){
+  const our = $('#ourTeamSelect');
+  const opp = $('#opponentSelect');
+  const sorted = [...TEAM_CONFIG].sort((a,b) => a.name.localeCompare(b.name));
+  sorted.forEach(t => {
+    const o1 = document.createElement('option');
+    o1.value = t.id; o1.textContent = `${t.name} (${t.abbr})`;
+    const o2 = o1.cloneNode(true);
+    our.appendChild(o1); opp.appendChild(o2);
+  });
+  our.value = state.ourTeamId;
+  opp.value = state.opponentId;
+  our.addEventListener('change', async () => { state.ourTeamId = Number(our.value); render(); await loadMatchupContext(); });
+  opp.addEventListener('change', async () => { state.opponentId = Number(opp.value); state.selectedStarterIndex = 0; loadSeedPacket(); render(); await loadMatchupContext(); });
+  $('#refreshLiveBtn').addEventListener('click', loadLivePacket);
+  $('#printBtn').addEventListener('click', () => window.print());
+}
+
+function initTabs(){
+  $$('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.tab').forEach(b => b.classList.remove('active'));
+      $$('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      $(`#${btn.dataset.tab}`).classList.add('active');
+    });
+  });
+}
+
+function setStatus(text, mode='info'){
+  const el = $('#dataStatus');
+  el.textContent = text;
+  el.className = `status-chip ${mode}`;
+}
+
+function loadSeedPacket(){
+  const generated = window.GENERATED_PACKETS?.[String(state.opponentId)];
+  const seed = generated || TEAM_PACKET_CACHE[String(state.opponentId)];
+  if (seed) {
+    state.packet = normalizeSeed(seed);
+    state.liveStatus = generated ? 'cache' : 'seed';
+    state.lastUpdated = seed.meta?.updatedAt || null;
+    setStatus(`${generated ? 'Generated cache' : 'Seed packet'} loaded · ${state.lastUpdated || 'snapshot'}`, generated ? 'good' : 'warn');
+  } else {
+    state.packet = makeEmptyPacket(state.opponentId);
+    state.liveStatus = 'empty';
+    state.lastUpdated = null;
+    setStatus('No local cache yet · use Refresh Live Data or run updater', 'warn');
+  }
+}
+
+async function fetchJson(url){
+  const res = await fetch(url, {cache:'no-store'});
+  if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return await res.json();
+}
+
+async function tryLoadGeneratedCache(){
+  try {
+    const json = await fetchJson('data/teamPackets.json');
+    if (json && json.packets) {
+      window.GENERATED_PACKETS = json.packets;
+      if (json.packets[String(state.opponentId)]) {
+        state.packet = normalizeSeed(json.packets[String(state.opponentId)]);
+        state.liveStatus = 'cache';
+        state.lastUpdated = json.generatedAt || state.packet?.meta?.updatedAt || null;
+        setStatus(`Generated cache loaded · ${state.lastUpdated || 'updated file'}`, 'good');
+        render();
+        return true;
+      }
+    }
+  } catch (e) {
+    // Expected when the updater has not been run yet or when opened from file://.
+  }
+  return false;
+}
+
+function normalizeSeed(seed){
+  const t = teamById(seed.meta?.teamId || state.opponentId) || teamById(state.opponentId);
+  return {
+    meta: {...seed.meta, teamId: t.id, abbr: t.abbr, opponent: t.name, updatedAt: seed.meta?.updatedAt || todayISO()},
+    overview: seed.overview || {},
+    upcoming: seed.upcoming || [],
+    starters: (seed.starters || []).map(s => ({...s, bats:s.bats || '—', throws:s.throws || '—'})),
+    hitters: (seed.hitters || []).map(h => ({...h, throws:h.throws || '—', bats:h.bats || '—', profileTags:h.profileTags || profileTagsFromPlan(h.stat || {}, h.bats)})),
+    bullpen: (seed.bullpen || []).map(a => ({...a, bats:a.bats || '—', throws:a.throws || '—'})),
+    sourceBreakdown: seed.sourceBreakdown || []
+  };
+}
+
+function makeEmptyPacket(teamId){
+  const t = teamById(teamId);
+  return {
+    meta: {teamId, abbr:t?.abbr || '', opponent:t?.name || 'Opponent', updatedAt:null, source:'No generated data cache yet.'},
+    overview: {
+      theme: 'Run the live refresh or scheduled update pipeline to populate the advance scouting packet from public data.',
+      notes: [
+        'This 30-team shell is ready for every MLB club and now includes an our-club matchup layer.',
+        'Live mode pulls active roster, handedness, season stats, schedule, and head-to-head results from MLB Stats API.',
+        'The Python updater adds Statcast pitch-level metrics and FanGraphs leaderboards into data/teamPackets.json.'
+      ],
+      priorities: [
+        {area:'Data refresh', why:'No local data packet exists for this opponent yet.', action:'Click Refresh Live Data or run python tools/update_data.py.', impact:'High'},
+        {area:'Our club matchup', why:'The matchup tab refreshes recent head-to-head results for the selected club pairing.', action:'Select Our Club and Opponent, then refresh live data.', impact:'High'},
+        {area:'Statcast layer', why:'Pitch arsenal, whiff, CSW, movement, and location indicators are produced by the updater.', action:'Run the updater with pybaseball after installing requirements.', impact:'High'},
+        {area:'FanGraphs layer', why:'wRC+, WAR, FIP, K%, BB%, and leaderboard context come from pybaseball FanGraphs functions.', action:'Use the scheduled GitHub Action or local updater.', impact:'Medium'}
+      ]
+    },
+    upcoming: [], starters: [], hitters: [], bullpen: [], sourceBreakdown: []
+  };
+}
+
+async function getRoster(teamId){
+  const urlA = `${MLB_API}/teams/${teamId}/roster/Active?season=${SEASON}`;
+  try { return await fetchJson(urlA); } catch(e) {}
+  const urlB = `${MLB_API}/teams/${teamId}/roster?rosterType=active&season=${SEASON}`;
+  return await fetchJson(urlB);
+}
+
+async function getPersonStats(personId, group){
+  const url = `${MLB_API}/people/${personId}/stats?stats=season&group=${group}&season=${SEASON}`;
+  try {
+    const json = await fetchJson(url);
+    return json?.stats?.[0]?.splits?.[0]?.stat || {};
+  } catch(e){
+    return {};
+  }
+}
+
+async function getSchedule(teamId, opponentId=null, startDate=todayISO(), endDate=addDaysISO(10)){
+  const opp = opponentId ? `&opponentId=${opponentId}` : '';
+  const url = `${MLB_API}/schedule?sportId=1&teamId=${teamId}${opp}&startDate=${startDate}&endDate=${endDate}&hydrate=probablePitcher,team,venue`;
+  try {
+    const json = await fetchJson(url);
+    return (json.dates || []).flatMap(d => (d.games || []).map(g => mapGame(g, d.date, teamId)));
+  } catch(e){ return []; }
+}
+
+function mapGame(g, date, perspectiveTeamId){
+  const away = g.teams?.away || {};
+  const home = g.teams?.home || {};
+  const awayTeam = away.team || {};
+  const homeTeam = home.team || {};
+  const isOurAway = Number(awayTeam.id) === Number(perspectiveTeamId);
+  const our = isOurAway ? away : home;
+  const them = isOurAway ? home : away;
+  const ourScore = safeNum(our.score, null);
+  const oppScore = safeNum(them.score, null);
+  let decision = 'Upcoming';
+  if (g.status?.abstractGameState === 'Final' && ourScore !== null && oppScore !== null) {
+    decision = ourScore > oppScore ? 'W' : ourScore < oppScore ? 'L' : 'T';
+  } else if (g.status?.abstractGameState === 'Live') {
+    decision = 'Live';
+  }
+  return {
+    date,
+    gamePk: g.gamePk,
+    matchup: `${awayTeam.name || 'Away'} at ${homeTeam.name || 'Home'}`,
+    opponent: them.team?.name || them.name || (isOurAway ? homeTeam.name : awayTeam.name) || 'TBD',
+    venue: g.venue?.name || '',
+    ourScore, oppScore,
+    score: ourScore !== null && oppScore !== null ? `${ourScore}-${oppScore}` : '—',
+    decision,
+    status: g.status?.detailedState || '',
+    awayProbable: away.probablePitcher?.fullName || 'TBD',
+    homeProbable: home.probablePitcher?.fullName || 'TBD',
+    homeAway: isOurAway ? 'Away' : 'Home'
+  };
+}
+
+async function loadMatchupContext(){
+  const our = teamById(state.ourTeamId);
+  const opp = teamById(state.opponentId);
+  if (!our || !opp || our.id === opp.id) {
+    state.matchup = {summary:'Select two different clubs to build the head-to-head layer.', finalGames:[], upcoming:[], cards:[], priorities:[]};
+    state.matchupStatus = 'empty';
+    renderMatchup(); renderOverview();
+    return;
+  }
+  state.matchupStatus = 'loading';
+  $('#liveProgress').textContent = `Loading ${our.abbr} vs ${opp.abbr} head-to-head context...`;
+  renderMatchup(); renderOverview();
+  try {
+    const games = await getSchedule(our.id, opp.id, addDaysISO(-365), addDaysISO(21));
+    const finalGames = games.filter(g => ['W','L','T'].includes(g.decision));
+    const upcoming = games.filter(g => !['W','L','T'].includes(g.decision));
+    const wins = finalGames.filter(g => g.decision === 'W').length;
+    const losses = finalGames.filter(g => g.decision === 'L').length;
+    const runsFor = finalGames.reduce((s,g)=>s+(safeNum(g.ourScore,0)||0),0);
+    const runsAgainst = finalGames.reduce((s,g)=>s+(safeNum(g.oppScore,0)||0),0);
+    const homeGames = finalGames.filter(g => g.homeAway === 'Home');
+    const awayGames = finalGames.filter(g => g.homeAway === 'Away');
+    const last = finalGames[finalGames.length-1];
+    const next = upcoming[0];
+    const diff = runsFor - runsAgainst;
+    const direction = diff > 0 ? 'Our club has controlled run prevention in the matchup so far.' : diff < 0 ? 'Opponent has created more run pressure in the matchup so far.' : 'Run differential is even in the current matchup sample.';
+    const summary = finalGames.length
+      ? `${our.name} are ${wins}-${losses} against ${opp.name} over the last 365 days with a ${diff >= 0 ? '+' : ''}${diff} run differential. ${direction}`
+      : `No completed head-to-head games were returned in the last 365 days for ${our.name} vs ${opp.name}. Use the upcoming section and opponent packet as the current series plan.`;
+    const priorities = buildMatchupPriorities(our, opp, {wins, losses, runsFor, runsAgainst, diff, last, next, finalGames, upcoming});
+    state.matchup = {
+      summary, finalGames, upcoming, wins, losses, runsFor, runsAgainst, diff,
+      last, next, generatedAt: new Date().toLocaleString(),
+      cards: [
+        {label:'H2H Record', value: finalGames.length ? `${wins}-${losses}` : 'No finals', note:`${finalGames.length} completed games loaded`},
+        {label:'Run Differential', value: finalGames.length ? `${diff >= 0 ? '+' : ''}${diff}` : '—', note:`Runs ${runsFor}-${runsAgainst}`},
+        {label:'Next Game', value: next ? next.date : 'TBD', note: next ? `${next.matchup} · ${next.venue}` : 'No upcoming head-to-head returned'},
+      ],
+      priorities
+    };
+    state.matchupStatus = 'loaded';
+  } catch(e) {
+    state.matchup = {summary:`Could not load head-to-head results in this browser. Error: ${e.message}`, finalGames:[], upcoming:[], cards:[], priorities:[]};
+    state.matchupStatus = 'error';
+  }
+  $('#liveProgress').textContent = state.matchupStatus === 'loaded' ? `Loaded ${our.abbr} vs ${opp.abbr} matchup context.` : '';
+  renderOverview(); renderMatchup();
+}
+
+function buildMatchupPriorities(our, opp, m){
+  const packet = state.packet || {};
+  const topH = packet.hitters?.[0];
+  const topS = packet.starters?.[0];
+  const bullpen = packet.bullpen || [];
+  const base = [];
+  base.push({priority:'Head-to-head trend', use:'Recent results against selected club', meaning: m.finalGames.length ? `${our.abbr} run differential is ${m.diff >= 0 ? '+' : ''}${m.diff}; do not ignore what has already worked/failed in the matchup.` : 'No completed head-to-head sample yet; lean on opponent traits and upcoming probables.', action: m.diff < 0 ? 'Tighten run-prevention plan early and prevent free baserunners before opponent damage bats.' : 'Keep the same run-prevention theme, but avoid assuming previous success guarantees the next series.'});
+  base.push({priority: topH?.name || 'Top opponent bat', use:'Opponent hitter attack card', meaning: topH ? `${topH.name} is the first hitter who should shape our run-prevention plan. ${topH.advanceNote || topH.strength || ''}` : 'Load live or generated data to identify the top hitter threat.', action: topH?.plan || 'Refresh opponent data.'});
+  base.push({priority: topS?.name || 'Probable starter group', use:'Starter attack plan', meaning: topS ? `${topS.name} sets the offensive approach. ${topS.advanceNote || topS.line || ''}` : 'Load starter candidates to build our offensive plan.', action: topS?.plan?.[0] || 'Refresh opponent data.'});
+  base.push({priority:'Bullpen matchup', use:'Late-game leverage planning', meaning: bullpen.length ? `${bullpen.length} relievers are available in the packet; identify who our lineup can force into the game before leverage arms.` : 'Bullpen board is empty until refresh/update.', action:'Extend starter pitch counts, pressure middle relief, and avoid giving leverage arms clean lanes.'});
+  return base;
+}
+
+function statLineHitter(stat){
+  const avg = stat.avg || '—';
+  const obp = stat.obp || '—';
+  const slg = stat.slg || '—';
+  const ops = stat.ops || '—';
+  return `${avg}/${obp}/${slg} · OPS ${ops} · HR ${stat.homeRuns || 0} · SB ${stat.stolenBases || 0}`;
+}
+function statLinePitcher(stat){
+  return `ERA ${stat.era || '—'} · WHIP ${stat.whip || '—'} · IP ${stat.inningsPitched || '—'} · K ${stat.strikeOuts || 0} · BB ${stat.baseOnBalls || 0}`;
+}
+function pitcherRole(stat){
+  const gs = safeNum(stat.gamesStarted, 0);
+  const sv = safeNum(stat.saves, 0);
+  const games = safeNum(stat.gamesPitched || stat.games, 0);
+  if (gs >= 5) return 'Starter';
+  if (sv >= 3) return 'Leverage relief';
+  if (games >= 15) return 'Bullpen';
+  return 'Pitching depth';
+}
+function inningsToDecimal(ip){
+  if (!ip) return 0;
+  const [whole, frac='0'] = String(ip).split('.');
+  return Number(whole) + (Number(frac) / 3);
+}
+function k9(stat){
+  const ip = inningsToDecimal(stat.inningsPitched);
+  const k = safeNum(stat.strikeOuts, 0);
+  return ip > 0 ? (k/ip*9) : null;
+}
+function bb9(stat){
+  const ip = inningsToDecimal(stat.inningsPitched);
+  const bb = safeNum(stat.baseOnBalls, 0);
+  return ip > 0 ? (bb/ip*9) : null;
+}
+function rate(numVal, denVal){
+  const n = safeNum(numVal, 0), d = safeNum(denVal, 0);
+  return d > 0 ? n / d * 100 : null;
+}
+function starterPredictability(stat){
+  const starts = safeNum(stat.gamesStarted,0), games = safeNum(stat.gamesPitched || stat.games,0);
+  const kk = k9(stat) || 6;
+  const whip = safeNum(stat.whip, 1.35);
+  let score = 50 + Math.min(18, starts * 1.5) + (kk > 9 ? 8 : 0) + (whip < 1.15 ? 6 : 0) - (games && starts/games < .5 ? 8 : 0);
+  return Math.max(35, Math.min(85, Math.round(score)));
+}
+function starterThreat(stat){
+  const era = safeNum(stat.era, 4.5), whip = safeNum(stat.whip, 1.35), kk = k9(stat) || 7;
+  let score = 50;
+  if (era < 3.25) score += 16; else if (era > 4.75) score -= 12;
+  if (whip < 1.15) score += 12; else if (whip > 1.45) score -= 12;
+  if (kk > 10) score += 12; else if (kk < 7) score -= 7;
+  return Math.max(25, Math.min(95, Math.round(score)));
+}
+function hitterThreat(stat){
+  const ops = safeNum(stat.ops, .700), hr = safeNum(stat.homeRuns,0), sb = safeNum(stat.stolenBases,0), obp = safeNum(stat.obp,.320);
+  let score = 45;
+  if (ops > .850) score += 25; else if (ops > .775) score += 15; else if (ops < .650) score -= 10;
+  if (hr >= 15) score += 10;
+  if (sb >= 15) score += 8;
+  if (obp > .360) score += 8;
+  return Math.max(25, Math.min(95, Math.round(score)));
+}
+function hitterThreatLabel(score){
+  if (score >= 72) return 'High';
+  if (score >= 52) return 'Medium';
+  return 'Lower';
+}
+function attackability(stat){
+  const so = safeNum(stat.strikeOuts,0), bb = safeNum(stat.baseOnBalls,0), pa = safeNum(stat.plateAppearances, safeNum(stat.atBats,0)+bb);
+  const ops = safeNum(stat.ops,.700);
+  const kRate = pa > 0 ? so/pa*100 : 20;
+  const bbRate = pa > 0 ? bb/pa*100 : 8;
+  let score = 50 + Math.min(22, Math.max(0, kRate-18)) - Math.min(12, Math.max(0, bbRate-8)) - (ops > .850 ? 10 : 0);
+  return Math.max(28, Math.min(88, Math.round(score)));
+}
+
+function calcRates(stat){
+  const so = safeNum(stat.strikeOuts,0);
+  const bb = safeNum(stat.baseOnBalls,0);
+  const pa = safeNum(stat.plateAppearances, safeNum(stat.atBats,0)+bb);
+  const avg = safeNum(stat.avg,.240), slg = safeNum(stat.slg,.400), ops = safeNum(stat.ops,.700), obp = safeNum(stat.obp,.320);
+  return {
+    kRate: pa ? so/pa*100 : null,
+    bbRate: pa ? bb/pa*100 : null,
+    iso: (slg !== null && avg !== null) ? slg-avg : null,
+    ops, obp, pa,
+  };
+}
+function bandFromScore(score){
+  const s = safeNum(score,50);
+  if (s >= 75) return 'Clear exploit lane';
+  if (s >= 55) return 'Manageable with execution';
+  return 'Difficult to attack cleanly';
+}
+function attackabilityExplanation(stat, score){
+  const r = calcRates(stat);
+  const points = [];
+  if (r.kRate !== null) points.push(`K% ${fmt(r.kRate,1)}`);
+  if (r.bbRate !== null) points.push(`BB% ${fmt(r.bbRate,1)}`);
+  if (r.iso !== null) points.push(`ISO ${fmt(r.iso,3)}`);
+  if (r.ops !== null) points.push(`OPS ${fmt(r.ops,3)}`);
+  const s = safeNum(score,50);
+  const interp = s >= 75 ? 'There is a clear pitcher-facing path: win strike one, expand after leverage, and avoid the primary damage lane.' :
+                 s >= 55 ? 'The hitter can be managed with execution, but the plan needs count discipline rather than automatic chase assumptions.' :
+                 'This is a lower-attackability hitter, meaning the report should be careful about free passes, repeated lanes, and predictable challenge counts.';
+  return `${bandFromScore(score)}. ${interp} Inputs: ${points.join(' · ') || 'season-line rates not returned'}.`;
+}
+function hitterMetricChips(h){
+  const st = h.stat || {};
+  const r = calcRates(st);
+  return [
+    ['Bats / Throws', handed(h.bats, h.throws)],
+    ['K%', r.kRate === null ? '—' : pct(r.kRate)],
+    ['BB%', r.bbRate === null ? '—' : pct(r.bbRate)],
+    ['ISO', r.iso === null ? '—' : fmt(r.iso,3)],
+    ['OPS', st.ops || '—'],
+    ['HR / SB', `${st.homeRuns || 0} / ${st.stolenBases || 0}`]
+  ];
+}
+function profileTagsFromPlan(stat, bats){
+  const r = calcRates(stat);
+  const hr = safeNum(stat.homeRuns,0), sb = safeNum(stat.stolenBases,0);
+  const tags = [bats === 'L' ? 'LHH' : bats === 'R' ? 'RHH' : bats === 'S' ? 'Switch' : 'Bats —'];
+  if (hr >= 12 || (r.iso ?? 0) >= .180) tags.push('Damage risk');
+  if (sb >= 12) tags.push('Speed pressure');
+  if ((r.bbRate ?? 0) >= 10 || (r.obp ?? 0) >= .355) tags.push('Zone control');
+  if ((r.kRate ?? 0) >= 24 && (r.bbRate ?? 9) < 9) tags.push('Expand when ahead');
+  if ((r.kRate ?? 100) < 17) tags.push('Contact bat');
+  if (!tags.some(t => ['Damage risk','Speed pressure','Zone control','Expand when ahead','Contact bat'].includes(t))) tags.push('Role-bat plan');
+  return tags;
+}
+
+function generateHitterPlan(player, stat){
+  const name = player.name || 'Hitter';
+  const bats = player.bats || '—';
+  const throws = player.throws || '—';
+  const score = hitterThreat(stat);
+  const label = hitterThreatLabel(score);
+  const attackScore = attackability(stat);
+  const hr = safeNum(stat.homeRuns,0), sb = safeNum(stat.stolenBases,0), ops = safeNum(stat.ops,.700), obp = safeNum(stat.obp,.320), slg = safeNum(stat.slg,.400), avg = safeNum(stat.avg,.240);
+  const so = safeNum(stat.strikeOuts,0), bb = safeNum(stat.baseOnBalls,0), pa = safeNum(stat.plateAppearances, safeNum(stat.atBats,0)+bb);
+  const kRate = pa ? so/pa*100 : 20;
+  const bbRate = pa ? bb/pa*100 : 8;
+  const iso = slg - avg;
+  const power = hr >= 12 || iso >= .180;
+  const speed = sb >= 12;
+  const patient = bbRate >= 10 || obp >= .355;
+  const chaseable = kRate >= 24 && bbRate < 9;
+  const contact = kRate < 17;
+  const handedLabel = bats === 'L' ? 'left-handed' : bats === 'R' ? 'right-handed' : bats === 'S' ? 'switch-hitting' : 'unknown-handed';
+  let strength, weakness, plan, countPlan, avoidZone;
+  if (power && patient) {
+    strength = `${name} combines damage with enough strike-zone control to punish predictable challenge counts.`;
+    weakness = `${name} is most attackable when our staff changes eye level before showing the inner-third damage lane.`;
+    plan = `Start ${name} with quality edges instead of chase bait. Once ahead, expand from the same tunnel and avoid giving the ${handedLabel} bat a middle-in heater.`;
+    countPlan = `Neutral counts: do not donate 2-0/3-1. Two strikes: expand just off the plate, not in the dirt where the take is easy.`;
+    avoidZone = `Avoid middle-in/middle-up fastballs and lazy secondary pitches that begin out of the hand.`;
+  } else if (power) {
+    strength = `${name} can change the inning on a mistake in a pull-side or middle-third damage lane.`;
+    weakness = `${name} becomes more manageable when forced to cover the outer lane before anything leaks back middle-in.`;
+    plan = `Do not let ${name} see a predictable heater in a happy zone. Start on the edge, change height, and finish just off the plate after strike one.`;
+    countPlan = `Neutral counts: get to strike one without using the obvious damage lane. Behind counts: pick one edge and accept a walk over slug damage.`;
+    avoidZone = `Avoid middle-in/middle-up misses unless the scouting plan specifically calls for elevated velocity above the barrel.`;
+  } else if (speed && patient) {
+    strength = `${name} creates inning pressure because the on-base skill lets the speed tool matter immediately.`;
+    weakness = `${name}'s value drops if our club controls the strike zone early and keeps him off first base.`;
+    plan = `Treat ${name} like an inning starter. Land strike one, vary tempo if he reaches, and avoid free baserunners ahead of the order.`;
+    countPlan = `Neutral counts: challenge with quality strikes. Two strikes: force contact on pitcher-friendly edges instead of wasting automatic balls.`;
+    avoidZone = `Avoid walks, slow tempo, and noncompetitive misses that allow the speed game to enter the inning.`;
+  } else if (patient) {
+    strength = `${name} can extend innings with zone control and force pitchers to execute quality strikes.`;
+    weakness = `${name} is not a free-chase target; the weakness is more about changing eye level without wasting pitches.`;
+    plan = `Make ${name} swing to beat us. Land early strikes, avoid nibbling into 2-0/3-1, and expand only after the zone is established.`;
+    countPlan = `Neutral counts: throw strike quality. Behind counts: do not turn the plate appearance into a walk by being too fine.`;
+    avoidZone = `Avoid obvious nibble sequences that create walks instead of contact.`;
+  } else if (chaseable) {
+    strength = `${name} still has enough bat speed to punish a pitch when our staff becomes predictable.`;
+    weakness = `${name}'s strikeout-to-walk shape gives our staff room to expand once ahead.`;
+    plan = `Get ${name} behind, then expand with shape that starts in the zone. Do not waste early pitches trying to chase before earning leverage.`;
+    countPlan = `Two strikes: expand below or just off the outer edge only after ${name} has seen a strike. Neutral counts: force a strike decision.`;
+    avoidZone = `Avoid waste pitches before strike one and avoid the center-cut fastball after showing the same lane twice.`;
+  } else if (contact) {
+    strength = `${name} puts the ball in play enough that location quality and defensive positioning matter more than pure stuff.`;
+    weakness = `${name} can be beaten by changing contact lanes instead of trying to force chase that may not come.`;
+    plan = `Challenge ${name} with competitive strikes, move the ball to pitcher-friendly parts of the zone, and do not repeat the same tunnel three times.`;
+    countPlan = `Neutral counts: stay aggressive. Two strikes: expand by inches, not feet, because contact skill can spoil borderline pitches.`;
+    avoidZone = `Avoid center-cut fastballs after showing the same look twice.`;
+  } else {
+    strength = `${name} profiles as a role bat in the public line, but mistakes still matter when the count gets predictable.`;
+    weakness = `${name} can be attacked by avoiding noncompetitive misses and forcing pitcher-friendly contact.`;
+    plan = `Challenge ${name} with competitive strikes and keep the ball out of the middle third when behind in the count.`;
+    countPlan = `Neutral counts: win strike one. Two strikes: expand off the edge only if the pitch starts in the zone.`;
+    avoidZone = `Avoid giving away leverage with early-count balls.`;
+  }
+  const advanceNote = `${name} (${handed(bats, throws)}, ${player.pos || '—'}) owns a ${stat.avg || '—'}/${stat.obp || '—'}/${stat.slg || '—'} slash with OPS ${stat.ops || '—'}, ${hr} HR, ${sb} SB, ${so} K and ${bb} BB in the loaded season line. The attack plan is built around the ${handedLabel} profile, ${fmt(kRate,1)}% K rate, ${fmt(bbRate,1)}% BB rate and ${fmt(iso,3)} ISO.`;
+  return {score,label,strength,weakness,plan,advanceNote,countPlan,avoidZone, attackabilityNote: attackabilityExplanation(stat, attackScore), profileTags: profileTagsFromPlan(stat, bats)};
+}
+
+function generateStarterPlan(player, stat, throws){
+  const name = player.name || 'Pitcher';
+  const bats = player.bats || '—';
+  const kk = k9(stat) || 7;
+  const walks = bb9(stat) || 3;
+  const whip = safeNum(stat.whip,1.35);
+  const era = safeNum(stat.era,4.5);
+  const starts = safeNum(stat.gamesStarted,0);
+  const ip = stat.inningsPitched || '—';
+  const primaryType = kk > 9.5 ? 'bat-missing' : era < 3.75 ? 'run-prevention' : walks > 3.7 ? 'command-volatility' : 'contact-management';
+  const side = throws === 'L' ? 'left-handed' : throws === 'R' ? 'right-handed' : 'unknown-handed';
+  const vsR = throws === 'L'
+    ? `${name} gives our RHH a platoon look. Right-handed hitters should hunt the first quality strike, make him prove secondary command, and avoid giving away chase below the zone once behind.`
+    : `${name} is a same-side look for our RHH. Right-handed hitters should avoid rollover contact early, force glove-side command, and be ready when he has to come back to the fastball lane.`;
+  const vsL = throws === 'R'
+    ? `${name} gives our LHH a platoon look. Left-handed hitters should force soft-away or breaking-ball execution into the zone before committing.`
+    : `${name} is a same-side look for our LHH. Left-handed hitters should make him land the breaking ball and avoid below-zone chase swings that let him escape the count.`;
+  const plan = [];
+  plan.push(kk > 9.5 ? `Do damage against ${name} before two-strike leverage because the strikeout profile can finish at-bats quickly.` : `Make ${name} work through deep counts and avoid early weak contact that keeps the pitch count down.`);
+  plan.push(walks > 3.7 ? `Shrink the zone against ${name}; walk pressure is part of the offensive path and our hitters should not bail him out early.` : `Be ready for early-count strikes from ${name}; do not let takeable damage pitches pass in the heart.`);
+  plan.push(whip < 1.15 ? `${name} rarely gives away baserunners, so chase discipline matters more than hoping for free traffic.` : `Create traffic against ${name} and force stretch execution because the baserunner profile is more vulnerable.`);
+  plan.push(`Our hitters should pick one lane per count rather than using a pull-only approach against the ${side} starter.`);
+  const damageZone = era > 4.50 ? `Attack ${name}'s heart/middle-third strikes before he gets to chase counts.` : `The best damage chance against ${name} is a mistake over the middle after forcing him away from his preferred count plan.`;
+  const advanceNote = `${name} (${handed(bats, throws)}) is a ${primaryType} starter/swing option with ${ip} IP, ${stat.strikeOuts || 0} K, ${stat.baseOnBalls || 0} BB, ERA ${stat.era || '—'} and WHIP ${stat.whip || '—'} in the loaded season line. ${starts ? `${starts} starts keeps him relevant for probable-starter planning.` : 'Treat him as a starter/swingman candidate unless updated probables say otherwise.'}`;
+  const sequenceNote = kk > 9.5 ? `${name}'s strikeout shape means our report should separate neutral-count strikes from putaway counts; the same pitch can play differently at 0-0 and 1-2.` : walks > 3.7 ? `${name}'s command shape makes the take/attack decision important. Our hitters should not bail him out with first-pitch chase.` : `${name}'s profile rewards a simple plan: hunt early mistakes and do not donate weak contact before seeing the arsenal.`;
+  const countPlan = walks > 3.7 ? 'Advantage counts: take until he proves strike quality. Behind counts: protect one lane, not the entire plate.' : 'Advantage counts: expect strike stealing. Behind counts: shrink vertically and reject chase below the zone.';
+  return {primaryType, vsR, vsL, plan, damageZone, advanceNote, sequenceNote, countPlan};
+}
+
+function generateRelieverPlan(player, stat){
+  const name = player.name || 'Reliever';
+  const throws = player.throws || '—';
+  const bats = player.bats || '—';
+  const sv = safeNum(stat.saves,0);
+  const gp = safeNum(stat.gamesPitched || stat.games,0);
+  const whip = safeNum(stat.whip,1.35);
+  const kk = k9(stat) || 7;
+  const role = sv >= 3 ? 'Leverage' : gp >= 15 ? 'Middle/bridge' : 'Depth relief';
+  const availability = 'Live line only; confirm last 3 days before final game-day packet';
+  const stress = Math.max(25, Math.min(85, Math.round(42 + gp*1.1 + sv*4 + (whip > 1.35 ? 6 : 0))));
+  const plan = kk > 10 ? `Against ${name}, our hitters need to be ready early because swing-and-miss stuff can take over once behind.` :
+               whip > 1.35 ? `Against ${name}, pressure the zone and create traffic; do not chase him out of command trouble.` :
+               `Against ${name}, force a strike in the intended lane before expanding to secondary shapes.`;
+  const advanceNote = `${name} (${handed(bats, throws)}) checks in as ${role.toLowerCase()} with ${gp} appearances, ${sv} saves, ERA ${stat.era || '—'} and WHIP ${stat.whip || '—'}. ${whip > 1.35 ? 'Traffic creation should be part of the late-game plan.' : 'Plan for cleaner innings and win the first hittable pitch.'}`;
+  return {role, availability, stress, plan, advanceNote};
+}
+
+async function loadLivePacket(){
+  if (state.loading) return;
+  state.loading = true;
+  setStatus('Loading live roster and season stats...', 'info');
+  $('#liveProgress').textContent = 'Fetching selected opponent from MLB Stats API. This can take a few seconds because player stats are loaded one-by-one.';
+  try {
+    const team = teamById(state.opponentId);
+    const [rosterJson, upcoming] = await Promise.all([getRoster(state.opponentId), getSchedule(state.opponentId)]);
+    const roster = (rosterJson.roster || []).map(r => ({
+      id: r.person?.id,
+      name: r.person?.fullName,
+      pos: r.position?.abbreviation || r.position?.name || '',
+      type: r.position?.type || '',
+      status: r.status?.description || '',
+      throws: r.person?.pitchHand?.code || '',
+      bats: r.person?.batSide?.code || '',
+      jersey: r.jerseyNumber || ''
+    })).filter(p => p.id);
+
+    let complete = 0;
+    const progress = () => { $('#liveProgress').textContent = `Loaded ${complete}/${roster.length} active-player stat lines for ${team.name}.`; };
+    progress();
+    const enriched = await Promise.all(roster.map(async p => {
+      const group = p.type === 'Pitcher' ? 'pitching' : 'hitting';
+      const stat = await getPersonStats(p.id, group);
+      complete += 1; progress();
+      return {...p, stat, group};
+    }));
+
+    const pitchers = enriched.filter(p => p.group === 'pitching');
+    const hitters = enriched.filter(p => p.group === 'hitting');
+    const starters = pitchers
+      .filter(p => safeNum(p.stat.gamesStarted,0) > 0 || safeNum(p.stat.inningsPitched,0) > 20)
+      .sort((a,b) => (safeNum(b.stat.gamesStarted,0)-safeNum(a.stat.gamesStarted,0)) || (inningsToDecimal(b.stat.inningsPitched)-inningsToDecimal(a.stat.inningsPitched)))
+      .slice(0,6)
+      .map(p => {
+        const plan = generateStarterPlan(p, p.stat, p.throws);
+        return {
+          id: String(p.id), name:p.name, throws:p.throws || '—', bats:p.bats || '—', role:pitcherRole(p.stat), bio:`${p.pos} · ${team.abbr} · ${handed(p.bats, p.throws)} · live MLB Stats API season line`, line:statLinePitcher(p.stat),
+          predictability: starterPredictability(p.stat), threat: starterThreat(p.stat), stat:p.stat, arsenal:[],
+          vsR:plan.vsR, vsL:plan.vsL, plan:plan.plan, damageZone:plan.damageZone,
+          advanceNote:plan.advanceNote, sequenceNote:plan.sequenceNote, countPlan:plan.countPlan,
+          dataGap:'Run the Statcast/FanGraphs updater to add pitch arsenal, whiff, CSW, movement, location, and FanGraphs WAR/FIP/wRC+ context.'
+        };
+      });
+    const hitterCards = hitters
+      .filter(p => safeNum(p.stat.atBats,0) > 0 || safeNum(p.stat.plateAppearances,0) > 0)
+      .sort((a,b) => hitterThreat(b.stat)-hitterThreat(a.stat))
+      .slice(0,14)
+      .map(p => {
+        const plan = generateHitterPlan(p, p.stat);
+        return {name:p.name, bats:p.bats || '—', throws:p.throws || '—', pos:p.pos, line:statLineHitter(p.stat), threat:plan.label, threatScore:plan.score, attackability:attackability(p.stat), attackabilityNote:plan.attackabilityNote, profileTags:plan.profileTags, strength:plan.strength, weakness:plan.weakness, plan:plan.plan, advanceNote:plan.advanceNote, countPlan:plan.countPlan, avoidZone:plan.avoidZone, stat:p.stat};
+      });
+    const relievers = pitchers
+      .filter(p => safeNum(p.stat.gamesStarted,0) <= 3 && (safeNum(p.stat.gamesPitched || p.stat.games,0) > 0 || safeNum(p.stat.saves,0) > 0))
+      .sort((a,b) => (safeNum(b.stat.saves,0)-safeNum(a.stat.saves,0)) || (safeNum(b.stat.gamesPitched || b.stat.games,0)-safeNum(a.stat.gamesPitched || a.stat.games,0)))
+      .slice(0,9)
+      .map(p => {
+        const rp = generateRelieverPlan(p, p.stat);
+        return {name:p.name, throws:p.throws || '—', bats:p.bats || '—', role:rp.role, stat:statLinePitcher(p.stat), availability:rp.availability, stress:rp.stress, plan:rp.plan, advanceNote:rp.advanceNote};
+      });
+
+    const topHitter = hitterCards[0];
+    const topStarter = starters[0];
+    state.packet = {
+      meta:{teamId:team.id, abbr:team.abbr, opponent:team.name, updatedAt:new Date().toLocaleString(), source:'Live MLB Stats API roster/season stats; advanced pitch layer requires updater.'},
+      upcoming,
+      overview:{
+        theme:`Live advance packet for ${team.name}: identify the top bats, probable rotation lanes, bullpen exposure, and our-club matchup adjustments from current public roster/stat lines.`,
+        notes:[
+          `${hitterCards.length} hitter cards and ${starters.length} starter candidates were generated from the active roster with B/T included where MLB roster data returned it.`,
+          `This live browser refresh uses MLB Stats API season stats. The scheduled updater adds Statcast pitch-level and FanGraphs leaderboard data.`,
+          `Opponent park/division context: ${team.division}, ${team.park}.`
+        ],
+        priorities:[
+          {area: topHitter?.name || 'Top offensive threat', why: topHitter ? `${topHitter.line}. ${topHitter.advanceNote}` : 'No hitter stats returned yet.', action: topHitter?.plan || 'Refresh later or run updater.', impact:'High'},
+          {area: topStarter?.name || 'Projected starter group', why: topStarter ? `${topStarter.line}. ${topStarter.advanceNote}` : 'No starter stats returned yet.', action: topStarter?.plan?.[0] || 'Load starters from live data.', impact:'High'},
+          {area:'Bullpen exposure', why:`${relievers.length} bullpen arms were parsed from the active roster.`, action:'Extend starters, force middle relief, and identify leverage arms after updater adds recent usage.', impact:'Medium'},
+          {area:'Our club context', why:'The matchup tab ties the selected opponent back to our club through recent head-to-head results and upcoming games.', action:'Use the H2H layer to adjust the final series plan.', impact:'High'}
+        ]
+      },
+      starters, hitters:hitterCards, bullpen:relievers,
+      sourceBreakdown:[
+        'MLB Stats API active roster endpoint for selected opponent, including bats/throws where returned.',
+        'MLB Stats API player season stat endpoint for hitter/pitcher lines.',
+        'MLB Stats API schedule endpoint for upcoming games, probables, and selected-club head-to-head results.',
+        'Run tools/update_data.py to add pybaseball Statcast and FanGraphs metrics.'
+      ]
+    };
+    state.liveStatus = 'live';
+    state.lastUpdated = state.packet.meta.updatedAt;
+    state.selectedStarterIndex = 0;
+    setStatus(`Live MLB data loaded · ${state.packet.meta.updatedAt}`, 'good');
+    render();
+    await loadMatchupContext();
+  } catch(e) {
+    console.error(e);
+    setStatus('Live refresh failed · run updater locally', 'bad');
+    $('#liveProgress').textContent = `Could not fetch live data in this browser. Error: ${e.message}. Use the Python updater or host with GitHub Pages.`;
+  } finally {
+    state.loading = false;
+  }
+}
+
+function render(){
+  const our = teamById(state.ourTeamId);
+  const opp = teamById(state.opponentId);
+  $('#ourClubLabel').textContent = our ? `${our.name} (${our.abbr})` : 'Our Club';
+  $('#opponentLabel').textContent = opp ? `${opp.name} (${opp.abbr})` : 'Opponent';
+  $('#snapshotLabel').textContent = state.lastUpdated || 'Not refreshed';
+  $('#useCaseLabel').textContent = '30-Team Advance Packet';
+  renderOverview();
+  renderMatchup();
+  renderStarters();
+  renderHitters();
+  renderBullpen();
+  renderTendencies();
+  renderPipeline();
+}
+
+function renderOverview(){
+  const p = state.packet || makeEmptyPacket(state.opponentId);
+  const our = teamById(state.ourTeamId);
+  const opp = teamById(state.opponentId);
+  $('#seriesText').innerHTML = `
+    <p>${html(p.overview?.theme || 'No overview loaded.')}</p>
+    ${(p.overview?.notes || []).map(n => `<p>${html(n)}</p>`).join('')}
+  `;
+  $('#teamSnapshot').innerHTML = [
+    ['Our Club', our ? `${our.name} (${our.abbr})` : '—'],
+    ['Opponent', opp ? `${opp.name} (${opp.abbr})` : '—'],
+    ['Division / League', opp ? `${opp.division} · ${opp.league}` : '—'],
+    ['Ballpark', opp?.park || '—'],
+    ['Data Mode', state.liveStatus === 'live' ? 'Live MLB Stats API' : state.liveStatus === 'cache' ? 'Generated Statcast/FanGraphs cache' : state.liveStatus === 'seed' ? 'Seed packet' : 'Awaiting refresh']
+  ].map(([l,v]) => `<div class="stat-row"><span>${html(l)}</span><strong>${html(v)}</strong></div>`).join('');
+
+  const m = state.matchup;
+  $('#matchupMode').textContent = state.matchupStatus === 'loaded' ? 'Live H2H' : state.matchupStatus === 'loading' ? 'Loading' : 'H2H Ready';
+  $('#ourClubMini').innerHTML = m ? `<p>${html(m.summary || '')}</p>${m.next ? `<p><strong>Next matchup:</strong> ${html(m.next.date)} · ${html(m.next.matchup)} · ${html(m.next.venue || '')}</p>` : '<p>Click Refresh Live Data or change the club selectors to pull head-to-head context.</p>'}` : '<p>Head-to-head context will load for the selected Our Club/Opponent pair.</p>';
+  $('#miniH2HTable').innerHTML = m?.finalGames?.length ? m.finalGames.slice(-5).reverse().map(g => `<tr><td>${html(g.date)}</td><td>${html(g.matchup)}</td><td>${html(g.score)}</td><td><span class="pill ${g.decision === 'W' ? 'good' : g.decision === 'L' ? 'high' : 'medium'}">${g.decision}</span></td><td>${html(g.venue)}</td></tr>`).join('') : '<tr><td colspan="5">No completed head-to-head games loaded yet.</td></tr>';
+
+  $('#priorityCards').innerHTML = (p.overview?.priorities || []).slice(0,4).map((x,i) => `
+    <article class="mini-card">
+      <span class="num">${String(i+1).padStart(2,'0')}</span>
+      <h3>${html(x.area)}</h3>
+      <p>${html(x.why)}</p>
+      <strong>${html(x.action)}</strong>
+      <span class="pill ${String(x.impact || 'Medium').toLowerCase()}">${html(x.impact || 'Medium')}</span>
+    </article>
+  `).join('');
+
+  $('#priorityTable').innerHTML = (p.overview?.priorities || []).map((x,i) => `
+    <tr><td>${i+1}</td><td>${html(x.area)}</td><td>${html(x.why)}</td><td>${html(x.action)}</td><td><span class="pill ${String(x.impact || 'Medium').toLowerCase()}">${html(x.impact || 'Medium')}</span></td></tr>
+  `).join('');
+
+  $('#upcomingGames').innerHTML = (p.upcoming && p.upcoming.length) ? p.upcoming.slice(0,6).map(g => `
+    <tr><td>${html(g.date)}</td><td>${html(g.opponent)}</td><td>${html(g.venue || '—')}</td><td>${html(g.awayProbable || 'TBD')} / ${html(g.homeProbable || 'TBD')}</td><td>${html(g.status || '—')}</td></tr>
+  `).join('') : `<tr><td colspan="5">Upcoming schedule/probable pitchers populate from live refresh or generated cache.</td></tr>`;
+}
+
+function renderMatchup(){
+  if (!$('#matchupCards')) return;
+  const our = teamById(state.ourTeamId);
+  const opp = teamById(state.opponentId);
+  const m = state.matchup;
+  const cards = m?.cards?.length ? m.cards : [
+    {label:'Selected Pairing', value:`${our?.abbr || '—'} vs ${opp?.abbr || '—'}`, note:'Head-to-head data loads from MLB Stats API'},
+    {label:'Status', value:state.matchupStatus, note:'Use selectors or refresh button'},
+    {label:'Report Use', value:'Matchup Layer', note:'Connects opponent scouting to our club'}
+  ];
+  $('#matchupCards').innerHTML = cards.map(c => `<article class="mini-card"><h3>${html(c.label)}</h3><strong class="large-value">${html(c.value)}</strong><p>${html(c.note)}</p></article>`).join('');
+  const rows = [];
+  if (m?.finalGames?.length) rows.push(...m.finalGames.slice().reverse());
+  if (m?.upcoming?.length) rows.push(...m.upcoming.slice(0,5));
+  $('#h2hTable').innerHTML = rows.length ? rows.map(g => `<tr><td>${html(g.date)}</td><td>${html(g.matchup)}</td><td>${html(g.venue)}</td><td>${html(g.score)}</td><td><span class="pill ${g.decision === 'W' ? 'good' : g.decision === 'L' ? 'high' : 'medium'}">${html(g.decision)}</span></td><td>${html(g.status)}</td></tr>`).join('') : '<tr><td colspan="6">No head-to-head results loaded yet. Select clubs or use Refresh Live Data.</td></tr>';
+  const topH = state.packet?.hitters?.[0];
+  const topS = state.packet?.starters?.[0];
+  $('#clubGamePlan').innerHTML = m ? `
+    <p>${html(m.summary || '')}</p>
+    <p><strong>Offensive focus for ${html(our?.abbr || 'our club')}:</strong> ${html(topS?.plan?.[0] || 'Load the opponent starter report to define the offensive approach.')}</p>
+    <p><strong>Run-prevention focus for ${html(our?.abbr || 'our club')}:</strong> ${html(topH?.plan || 'Load hitter attack cards to identify the first opponent bat who changes the series plan.')}</p>
+    <p><strong>Late-game focus:</strong> ${html((state.packet?.bullpen?.[0]?.plan) || 'Use the bullpen board to find the reliever group our club should pressure.')}</p>
+  ` : '<p>Matchup context has not loaded yet.</p>';
+  $('#matchupPriorityTable').innerHTML = m?.priorities?.length ? m.priorities.map(x => `<tr><td>${html(x.priority)}</td><td>${html(x.use)}</td><td>${html(x.meaning)}</td><td>${html(x.action)}</td></tr>`).join('') : '<tr><td colspan="4">Matchup priorities appear after H2H data loads.</td></tr>';
+}
+
+function renderStarters(){
+  const starters = state.packet?.starters || [];
+  const row = $('#starterSelector');
+  row.innerHTML = starters.length ? starters.map((s,i) => `<button class="choice ${i === state.selectedStarterIndex ? 'active':''}" data-i="${i}">${html(s.name)}<span>${html(handed(s.bats, s.throws))} · ${html(s.role || '')}</span></button>`).join('') : '<div class="empty">No starter candidates loaded. Refresh live data or run the updater.</div>';
+  $$('#starterSelector .choice').forEach(btn => btn.addEventListener('click', () => { state.selectedStarterIndex = Number(btn.dataset.i); renderStarters(); renderTendencies(); }));
+  const s = starters[state.selectedStarterIndex] || starters[0];
+  if(!s){ $('#starterDetail').innerHTML = ''; return; }
+  const arsenal = (s.arsenal || []).length ? (s.arsenal || []).map(a => `
+    <tr><td>${html(a.pitch)}</td><td>${pct(a.usage)}</td><td>${fmt(a.velo,1)}</td><td>${fmt(a.ivb,1)}</td><td>${fmt(a.hb,1)}</td><td>${pct(a.whiff)}</td><td>${pct(a.csw)}</td><td>${html(a.note || '')}</td></tr>
+  `).join('') : `<tr><td colspan="8">Pitch-level arsenal is not in live browser mode. Run <code>python tools/update_data.py</code> to populate Statcast usage, velocity, movement, whiff, CSW, and location indicators.</td></tr>`;
+  $('#starterDetail').innerHTML = `
+    <article class="card starter-card">
+      <div class="card-title-row">
+        <div><p class="eyebrow">Opposing starter plan</p><h2>${html(s.name)}</h2><p class="muted">${html(s.bio || handed(s.bats, s.throws))}</p></div>
+        <div class="score-box"><span>Threat</span><strong>${html(s.threat || '—')}</strong></div>
+        <div class="score-box"><span>Predictability</span><strong>${html(s.predictability || '—')}</strong></div>
+      </div>
+      <div class="line-box">${html(s.line || '—')}</div>
+      ${s.dataGap ? `<p class="data-gap">${html(s.dataGap)}</p>` : ''}
+      <div class="grid two">
+        <div><h3>Advance Note</h3><p>${html(s.advanceNote || 'Run the live refresh/updater to generate the individualized advance note.')}</p></div>
+        <div><h3>Count / Sequence Note</h3><p>${html(s.sequenceNote || s.countPlan || 'Use the tendency board to separate neutral-count and finish-count behavior.')}</p></div>
+      </div>
+      <div class="grid two">
+        <div><h3>How He Attacks RHH</h3><p>${html(s.vsR || '—')}</p></div>
+        <div><h3>How He Attacks LHH</h3><p>${html(s.vsL || '—')}</p></div>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr><th>Pitch</th><th>Usage</th><th>Velo</th><th>IVB</th><th>HB</th><th>Whiff</th><th>CSW</th><th>Advance Note</th></tr></thead><tbody>${arsenal}</tbody></table>
+      </div>
+      <div class="grid two">
+        <div class="callout"><h3>Offensive Attack Plan</h3><ul>${(s.plan || []).map(x => `<li>${html(x)}</li>`).join('')}</ul></div>
+        <div class="callout"><h3>Damage Zone</h3><p>${html(s.damageZone || 'Force him into the zone and attack mistakes over the heart.')}</p><p><strong>Count plan:</strong> ${html(s.countPlan || 'Win the first pitch, then shrink the zone with two strikes.')}</p></div>
+      </div>
+    </article>`;
+}
+
+function renderHitters(){
+  const hitters = state.packet?.hitters || [];
+  const term = ($('#hitterSearch')?.value || '').toLowerCase();
+  const risk = $('#riskFilter')?.value || 'all';
+  const filtered = hitters.filter(h => {
+    const text = `${h.name} ${h.bats} ${h.throws} ${h.pos} ${h.strength} ${h.weakness} ${h.plan} ${h.advanceNote} ${(h.profileTags||[]).join(' ')}`.toLowerCase();
+    return (!term || text.includes(term)) && (risk === 'all' || h.threat === risk);
+  });
+  $('#hitterCards').innerHTML = filtered.length ? filtered.map(h => {
+    const chips = hitterMetricChips(h).map(([k,v]) => `<div class="metric-chip"><span>${html(k)}</span><strong>${html(v)}</strong></div>`).join('');
+    const tags = (h.profileTags || profileTagsFromPlan(h.stat || {}, h.bats)).map(t => `<span class="tag">${html(t)}</span>`).join('');
+    const attackNote = h.attackabilityNote || attackabilityExplanation(h.stat || {}, h.attackability);
+    return `
+    <article class="card hitter-card">
+      <div class="card-title-row">
+        <div><h3>${html(h.name)}</h3><p class="muted">${html(handed(h.bats, h.throws))} · ${html(h.pos || '—')} · ${html(h.line || '')}</p></div>
+        <span class="pill ${String(h.threat || 'Medium').toLowerCase()}">${html(h.threat || 'Medium')}</span>
+      </div>
+      <div class="tag-list">${tags}</div>
+      <div class="metric-grid">${chips}</div>
+      <div class="meter"><span style="width:${safeNum(h.attackability,50)}%"></span></div>
+      <p class="meter-label">Attackability ${html(h.attackability || '—')}/100 · ${html(bandFromScore(h.attackability))}</p>
+      <p class="scouting-note"><strong>Why attackable:</strong> ${html(attackNote)}</p>
+      <p><strong>Advance Note:</strong> ${html(h.advanceNote || 'Run refresh/updater for individualized note.')}</p>
+      <p><strong>Strength:</strong> ${html(h.strength || '—')}</p>
+      <p><strong>Weakness:</strong> ${html(h.weakness || '—')}</p>
+      <p><strong>Pitch Plan:</strong> ${html(h.plan || '—')}</p>
+      <p><strong>Count Plan:</strong> ${html(h.countPlan || 'Win strike one and avoid middle-third mistakes.')}</p>
+      <p><strong>Avoid:</strong> ${html(h.avoidZone || 'Predictable heart-zone mistakes.')}</p>
+    </article>`;
+  }).join('') : '<div class="empty">No hitter cards loaded for this filter.</div>';
+}
+
+function renderBullpen(){
+  const arms = state.packet?.bullpen || [];
+  $('#bullpenStress').innerHTML = arms.slice(0,5).map(a => `
+    <div class="bar-row"><span>${html(a.name)} <small>${html(handed(a.bats, a.throws))}</small></span><div class="meter"><span style="width:${safeNum(a.stress,40)}%"></span></div><strong>${html(a.stress || '—')}</strong></div>
+  `).join('') || '<p>No bullpen arms loaded.</p>';
+  $('#relieverTable').innerHTML = arms.length ? arms.map(a => `
+    <tr><td>${html(a.name)}</td><td>${html(handed(a.bats, a.throws))}</td><td>${html(a.role || '—')}</td><td>${html(a.stat || '—')}<br><span class="muted-small">${html(a.advanceNote || '')}</span></td><td>${html(a.availability || '—')}</td><td>${html(a.plan || '—')}</td></tr>
+  `).join('') : '<tr><td colspan="6">Refresh live data or run the updater to populate bullpen board.</td></tr>';
+}
+
+function renderTendencies(){
+  const starters = state.packet?.starters || [];
+  const rows = [];
+  starters.slice(0,6).forEach(s => {
+    if (Array.isArray(s.situations) && s.situations.length) {
+      s.situations.slice(0,6).forEach(x => rows.push({name:s.name, sit:x.situation, pitch:x.pitch, prob:x.probability, note:x.note}));
+      return;
+    }
+    const arsenalSorted = [...(s.arsenal || [])].sort((a,b)=>safeNum(b.usage,0)-safeNum(a.usage,0));
+    const primary = arsenalSorted[0]?.pitch || (safeNum(s.stat?.strikeOuts,0) > 70 ? 'Fastball / best bat-missing pitch' : 'Primary strike pitch');
+    const secondary = arsenalSorted[1]?.pitch || 'Secondary/change-of-speed lane';
+    rows.push({name:s.name, sit:'0-0 vs RHH', pitch:primary, prob:Math.min(72, Math.max(42, safeNum(arsenalSorted[0]?.usage, 54))), note:`Be ready to hit ${s.name}'s first competitive strike if it is in the damage lane.`});
+    rows.push({name:s.name, sit:'0-2 / 1-2', pitch:secondary, prob:Math.min(65, Math.max(35, safeNum(s.predictability,60)-18)), note:`Protect the edge against ${s.name}, but reject noncompetitive finish pitches.`});
+    rows.push({name:s.name, sit:'2-0 / 3-1', pitch:primary, prob:Math.min(78, Math.max(52, safeNum(s.predictability,62))), note:`Hunt one lane only. Do not miss ${s.name}'s best fastball-zone swing.`});
+  });
+  $('#tendencyTable').innerHTML = rows.length ? rows.map(r => `<tr><td>${html(r.name)}</td><td>${html(r.sit)}</td><td>${html(r.pitch)}</td><td>${fmt(r.prob,0)}%</td><td>${html(r.note)}</td></tr>`).join('') : '<tr><td colspan="5">Tendency board appears after starter data is loaded.</td></tr>';
+  $('#predictabilityBars').innerHTML = starters.slice(0,6).map(s => `
+    <div class="bar-row"><span>${html(s.name)}</span><div class="meter"><span style="width:${safeNum(s.predictability,50)}%"></span></div><strong>${html(s.predictability || '—')}</strong></div>
+  `).join('') || '<p>No predictability scores loaded.</p>';
+}
+
+function renderPipeline(){
+  const p = state.packet || {};
+  $('#sourceList').innerHTML = (p.sourceBreakdown || [
+    'Baseball Savant / Statcast CSV documentation for pitch-level fields.',
+    'pybaseball Statcast functions for pitch-level pulls by date range or player.',
+    'FanGraphs leaderboards via pybaseball batting_stats and pitching_stats functions.',
+    'MLB Stats API active roster, schedule, season stat, bats/throws, probable pitcher, and head-to-head endpoints for live browser mode.'
+  ]).map(s => `<li>${html(s)}</li>`).join('');
+}
+
+function initFilters(){
+  $('#hitterSearch').addEventListener('input', renderHitters);
+  $('#riskFilter').addEventListener('change', renderHitters);
+}
+
+async function init(){
+  initSelectors(); initTabs(); initFilters();
+  loadSeedPacket();
+  render();
+  await tryLoadGeneratedCache();
+  await loadMatchupContext();
+}
+
+init();
+
+</script>
+</body>
+</html>
